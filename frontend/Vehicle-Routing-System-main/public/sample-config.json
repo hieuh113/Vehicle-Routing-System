@@ -1,0 +1,70 @@
+{
+  "warehouse": {
+    "x": 50,
+    "y": 50,
+    "id": "warehouse",
+    "label": "Warehouse"
+  },
+  "deliveryItems": [
+    {
+      "id": "item-1",
+      "location": { "x": 20, "y": 30, "id": "loc-1", "label": "Item 1" }
+    },
+    {
+      "id": "item-2",
+      "location": { "x": 80, "y": 20, "id": "loc-2", "label": "Item 2" }
+    },
+    {
+      "id": "item-3",
+      "location": { "x": 70, "y": 80, "id": "loc-3", "label": "Item 3" }
+    },
+    {
+      "id": "item-4",
+      "location": { "x": 30, "y": 70, "id": "loc-4", "label": "Item 4" }
+    },
+    {
+      "id": "item-5",
+      "location": { "x": 60, "y": 40, "id": "loc-5", "label": "Item 5" }
+    },
+    {
+      "id": "item-6",
+      "location": { "x": 40, "y": 60, "id": "loc-6", "label": "Item 6" }
+    },
+    {
+      "id": "item-7",
+      "location": { "x": 15, "y": 85, "id": "loc-7", "label": "Item 7" }
+    },
+    {
+      "id": "item-8",
+      "location": { "x": 85, "y": 70, "id": "loc-8", "label": "Item 8" }
+    },
+    {
+      "id": "item-9",
+      "location": { "x": 25, "y": 15, "id": "loc-9", "label": "Item 9" }
+    },
+    {
+      "id": "item-10",
+      "location": { "x": 75, "y": 35, "id": "loc-10", "label": "Item 10" }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "DA-1",
+      "capacity": 5,
+      "maxDistance": 150,
+      "color": "#3b82f6"
+    },
+    {
+      "id": "DA-2",
+      "capacity": 5,
+      "maxDistance": 150,
+      "color": "#ef4444"
+    },
+    {
+      "id": "DA-3",
+      "capacity": 4,
+      "maxDistance": 120,
+      "color": "#10b981"
+    }
+  ]
+}
