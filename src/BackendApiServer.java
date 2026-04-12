@@ -111,11 +111,17 @@ public class BackendApiServer {
         for (Object rawItem : rawItems) {
             Map<String, Object> itemMap = (Map<String, Object>) rawItem;
             Map<String, Object> location = (Map<String, Object>) itemMap.get("location");
+            double earliestTime = getDoubleOrDefault(itemMap, "earliestTime", 0.0);
+            double latestTime = getDoubleOrDefault(itemMap, "latestTime", Double.MAX_VALUE);
+            double serviceTime = getDoubleOrDefault(itemMap, "serviceTime", 0.0);
 
             items.add(new DeliveryItem(
                     parseNumericId(itemMap.get("id").toString()),
                     toDouble(location.get("x")),
-                    toDouble(location.get("y"))
+                    toDouble(location.get("y")),
+                    earliestTime,
+                    latestTime,
+                    serviceTime
             ));
         }
 
@@ -205,6 +211,9 @@ public class BackendApiServer {
     private static void appendDeliveryItem(StringBuilder json, DeliveryItem item) {
         json.append("{");
         appendField(json, "id", "item-" + item.getId()).append(",");
+        appendField(json, "earliestTime", item.getEarliestTime()).append(",");
+        appendField(json, "latestTime", item.getLatestTime()).append(",");
+        appendField(json, "serviceTime", item.getServiceTime()).append(",");
         json.append("\"location\":{");
         appendField(json, "x", item.getX()).append(",");
         appendField(json, "y", item.getY()).append(",");

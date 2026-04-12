@@ -10,6 +10,9 @@ export interface Location {
 export interface DeliveryItem {
   id: string;
   location: Location;
+  earliestTime?: number;
+  latestTime?: number;
+  serviceTime?: number;
   delivered?: boolean;
 }
 

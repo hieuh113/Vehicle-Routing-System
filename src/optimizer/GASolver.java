@@ -7,6 +7,7 @@ import model.RouteAssignment;
 import model.VehicleInfo;
 import model.Warehouse;
 import util.DistanceCalculator;
+import util.RouteTimeEvaluator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -204,8 +205,9 @@ public class GASolver {
                     List<DeliveryItem> trialRoute = new ArrayList<>(currentItems);
                     trialRoute.add(candidateItem);
                     double trialDistance = calculateRouteDistance(trialRoute);
+                    boolean timeFeasible = RouteTimeEvaluator.evaluate(warehouse, trialRoute).isFeasible();
 
-                    if (trialDistance <= vehicle.getMaxDistance()) {
+                    if (trialDistance <= vehicle.getMaxDistance() && timeFeasible) {
                         currentItems.add(candidateItem);
                         vehicleItemIds.get(vehicle.getVehicleId()).add(candidateItem.getId());
                         assigned = true;
@@ -280,6 +282,24 @@ public class GASolver {
                 );
             }
 
+            List<DeliveryItem> assignedRouteItems = new ArrayList<>();
+            for (Integer itemId : assignment.getItemIds()) {
+                DeliveryItem matchedItem = findItemById(items, itemId);
+                if (matchedItem == null) {
+                    throw new IllegalStateException("Assigned item not found in master item list: " + itemId);
+                }
+                assignedRouteItems.add(matchedItem);
+            }
+
+            RouteTimeEvaluator.RouteTimeResult timeResult =
+                    RouteTimeEvaluator.evaluate(warehouse, assignedRouteItems);
+            if (!timeResult.isFeasible()) {
+                throw new IllegalStateException(
+                        "Time window violation for vehicle " + vehicle.getVehicleId()
+                                + " on assigned route " + assignment.getItemIds()
+                );
+            }
+
             for (Integer itemId : assignment.getItemIds()) {
                 if (undeliveredIds.contains(itemId)) {
                     throw new IllegalStateException("Item " + itemId + " appears in both assigned and undelivered.");
@@ -314,6 +334,15 @@ public class GASolver {
                             + ", result = " + result.totalDistance
             );
         }
+    }
+
+    private DeliveryItem findItemById(List<DeliveryItem> items, int itemId) {
+        for (DeliveryItem item : items) {
+            if (item.getId() == itemId) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private double calculateRouteDistance(List<DeliveryItem> routeItems) {

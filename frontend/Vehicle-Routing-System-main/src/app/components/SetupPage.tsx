@@ -200,8 +200,8 @@ export function SetupPage() {
       .filter(line => line.length > 0 && !line.startsWith('#'))
       .map((line, index) => {
         const parts = line.split(',').map(part => part.trim());
-        if (parts.length !== 3) {
-          throw new Error(`Invalid item line: ${line}`);
+        if (parts.length !== 3 && parts.length !== 6) {
+          throw new Error(`Invalid item line: expected 3 or 6 comma-separated values, got ${parts.length}`);
         }
 
         const idNumber = parseInt(parts[0], 10);
@@ -212,8 +212,33 @@ export function SetupPage() {
           throw new Error(`Invalid item values: ${line}`);
         }
 
+        let earliestTime: number | undefined;
+        let latestTime: number | undefined;
+        let serviceTime: number | undefined;
+
+        if (parts.length === 6) {
+          earliestTime = parseFloat(parts[3]);
+          latestTime = parseFloat(parts[4]);
+          serviceTime = parseFloat(parts[5]);
+
+          if (!Number.isFinite(earliestTime) || !Number.isFinite(latestTime) || !Number.isFinite(serviceTime)) {
+            throw new Error(`Invalid VRPTW values: ${line}`);
+          }
+
+          if (latestTime < earliestTime) {
+            throw new Error(`Invalid time window: latestTime must be >= earliestTime in line ${line}`);
+          }
+
+          if (serviceTime < 0) {
+            throw new Error(`Invalid serviceTime: must be non-negative in line ${line}`);
+          }
+        }
+
         return {
           id: `item-${idNumber}`,
+          earliestTime,
+          latestTime,
+          serviceTime,
           location: {
             x,
             y,
@@ -359,12 +384,18 @@ export function SetupPage() {
 
                 <TabsContent value="manual" className="space-y-4">
                   <p className="text-sm text-slate-600">
-                    Load a JSON config or a text file using itemId,x,y lines, then review the generated items here.
+                    Load a JSON config or a text file using either itemId,x,y or itemId,x,y,earliestTime,latestTime,serviceTime lines.
                   </p>
                   <div className="max-h-40 overflow-y-auto space-y-2">
                     {deliveryItems.map(item => (
                       <div key={item.id} className="text-sm bg-slate-100 p-2 rounded">
                         {item.location.label} - ({item.location.x.toFixed(1)}, {item.location.y.toFixed(1)})
+                        {typeof item.earliestTime === 'number' && typeof item.latestTime === 'number' && (
+                          <span className="block text-slate-600">
+                            Window: {item.earliestTime} - {item.latestTime}
+                            {typeof item.serviceTime === 'number' ? ` | Service: ${item.serviceTime}` : ''}
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>
